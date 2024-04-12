@@ -82,21 +82,23 @@ def vectoriser_texte(texte, embeddings_index, embedding_dim):
             # Récupérer le vecteur GloVe correspondant
             vecteur_mot = embeddings_index[mot]
         else:
-            # Si le mot n'est pas dans les embeddings GloVe, utiliser un vecteur aléatoire ou zéro
-            vecteur_mot = np.zeros(embedding_dim)  # Vecteur zéro pour les mots hors vocabulaire
+            
+             # Vecteur zéro pour les mots hors vocabulaire
+            vecteur_mot = np.zeros(embedding_dim) 
         # Ajouter le vecteur du mot à la liste des vecteurs
         vecteurs.append(vecteur_mot)
     # Agréger les vecteurs de mots pour obtenir une représentation vectorielle du texte
     if vecteurs:
-        representation_texte = np.mean(vecteurs, axis=0)  # Moyenne des vecteurs de mots
+        # Moyenne des vecteurs de mots
+        representation_texte = np.mean(vecteurs, axis=0) 
     else:
-        representation_texte = np.zeros(embedding_dim)  # Vecteur zéro si aucun mot n'est présent
+        # Vecteur zéro si aucun mot n'est présent
+        representation_texte = np.zeros(embedding_dim)  
     return representation_texte
 
 # Taille de dimension des embeddings GloVe
 embedding_dim = 100 
 
-# Parcourir chaque document (brevet) dans vos données
 representations_vectorielles = []
 for document in donnees:
     # Vectoriser le texte du document en utilisant les embeddings GloVe
@@ -104,10 +106,3 @@ for document in donnees:
     # Ajouter la représentation vectorielle du document à la liste des représentations vectorielles
     representations_vectorielles.append(representation_document)
 
-# Maintenant, representations_vectorielles contient les représentations vectorielles de vos documents de brevets
-# Vous pouvez utiliser ces représentations dans votre modèle de classification
-# Afficher les représentations vectorielles de quelques documents de brevets
-for i in range(5):  # Afficher les représentations vectorielles des 5 premiers documents
-    print("Représentation vectorielle du document", i+1, ":")
-    print(representations_vectorielles[i])
-    print()
