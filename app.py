@@ -32,6 +32,7 @@ def parcourir_repertoire(repertoire, cles_a_supprimer):
                     df_tokenise = df.applymap(tokeniser_texte)
                     dfs.append(df_tokenise)    
     return dfs
+
 # Liste des clés à supprimer
 cles_a_supprimer = ['doc_number', 'country_code', 'kind_code','lang','date']
 
@@ -43,7 +44,7 @@ def tokeniser_texte(texte):
     # Suppression des stopwords
     stop_words = set(stopwords.words('english'))
     tokens = [mot for mot in tokens if mot.lower() not in stop_words]
-     # Lemmatisation des tokens
+    # Lemmatisation des tokens
     lemmatizer = WordNetLemmatizer()
     tokens = [lemmatizer.lemmatize(token) for token in tokens]
    
@@ -71,7 +72,6 @@ embedding_file_path = './wordEmb/glove.6B.100d.txt'
 # Charger les embeddings
 embeddings_index = load_embeddings(embedding_file_path)
 
-
 def vectoriser_texte(texte, embeddings_index, embedding_dim):
     # Initialiser une liste pour stocker les vecteurs de mots
     vecteurs = []
@@ -83,7 +83,6 @@ def vectoriser_texte(texte, embeddings_index, embedding_dim):
             vecteur_mot = embeddings_index[mot]
         else:
             # Si le mot n'est pas dans les embeddings GloVe, utiliser un vecteur aléatoire ou zéro
-           
             vecteur_mot = np.zeros(embedding_dim)  # Vecteur zéro pour les mots hors vocabulaire
         # Ajouter le vecteur du mot à la liste des vecteurs
         vecteurs.append(vecteur_mot)
@@ -112,9 +111,3 @@ for i in range(5):  # Afficher les représentations vectorielles des 5 premiers 
     print("Représentation vectorielle du document", i+1, ":")
     print(representations_vectorielles[i])
     print()
-
-# Calculer la similarité entre deux documents de brevets (par exemple, entre le premier et le deuxième document)
-from sklearn.metrics.pairwise import cosine_similarity
-
-similarite = cosine_similarity(representations_vectorielles[0].reshape(1, -1), representations_vectorielles[1].reshape(1, -1))
-print("Similarité entre le premier et le deuxième document :", similarite[0][0])
