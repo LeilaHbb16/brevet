@@ -1,11 +1,15 @@
 import os
 import json
-import pandas as pd
 import nltk
-from nltk.tokenize import word_tokenize
-from nltk.corpus import stopwords
 import string
+import pandas as pd
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+from nltk.stem import WordNetLemmatizer
 
+# Les données nécessaires pour NLTK
+nltk.download('stopwords')
+nltk.download('punkt')
 
 def parcourir_repertoire(repertoire):
     dfs = [] 
@@ -31,11 +35,12 @@ def tokeniser_texte(texte):
     # Suppression des stopwords
     stop_words = set(stopwords.words('english'))
     tokens = [mot for mot in tokens if mot.lower() not in stop_words]
+     # Lemmatisation des tokens
+    lemmatizer = WordNetLemmatizer()
+    tokens = [lemmatizer.lemmatize(token) for token in tokens]
+   
     return tokens
 
-# Les données nécessaires pour NLTK
-nltk.download('stopwords')
-nltk.download('punkt')
 
 # Chemin du répertoire à parcourir
 repertoire_a_explorer = '../brevets_alternants'
