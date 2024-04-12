@@ -70,3 +70,51 @@ embedding_file_path = './wordEmb/glove.6B.100d.txt'
 
 # Charger les embeddings
 embeddings_index = load_embeddings(embedding_file_path)
+
+
+def vectoriser_texte(texte, embeddings_index, embedding_dim):
+    # Initialiser une liste pour stocker les vecteurs de mots
+    vecteurs = []
+    # Parcourir chaque mot dans le texte tokenisé
+    for mot in texte:
+        # Vérifier si le mot se trouve dans les embeddings GloVe
+        if mot in embeddings_index:
+            # Récupérer le vecteur GloVe correspondant
+            vecteur_mot = embeddings_index[mot]
+        else:
+            # Si le mot n'est pas dans les embeddings GloVe, utiliser un vecteur aléatoire ou zéro
+           
+            vecteur_mot = np.zeros(embedding_dim)  # Vecteur zéro pour les mots hors vocabulaire
+        # Ajouter le vecteur du mot à la liste des vecteurs
+        vecteurs.append(vecteur_mot)
+    # Agréger les vecteurs de mots pour obtenir une représentation vectorielle du texte
+    if vecteurs:
+        representation_texte = np.mean(vecteurs, axis=0)  # Moyenne des vecteurs de mots
+    else:
+        representation_texte = np.zeros(embedding_dim)  # Vecteur zéro si aucun mot n'est présent
+    return representation_texte
+
+# Taille de dimension des embeddings GloVe
+embedding_dim = 100 
+
+# Parcourir chaque document (brevet) dans vos données
+representations_vectorielles = []
+for document in donnees:
+    # Vectoriser le texte du document en utilisant les embeddings GloVe
+    representation_document = vectoriser_texte(document, embeddings_index, embedding_dim)
+    # Ajouter la représentation vectorielle du document à la liste des représentations vectorielles
+    representations_vectorielles.append(representation_document)
+
+# Maintenant, representations_vectorielles contient les représentations vectorielles de vos documents de brevets
+# Vous pouvez utiliser ces représentations dans votre modèle de classification
+# Afficher les représentations vectorielles de quelques documents de brevets
+for i in range(5):  # Afficher les représentations vectorielles des 5 premiers documents
+    print("Représentation vectorielle du document", i+1, ":")
+    print(representations_vectorielles[i])
+    print()
+
+# Calculer la similarité entre deux documents de brevets (par exemple, entre le premier et le deuxième document)
+from sklearn.metrics.pairwise import cosine_similarity
+
+similarite = cosine_similarity(representations_vectorielles[0].reshape(1, -1), representations_vectorielles[1].reshape(1, -1))
+print("Similarité entre le premier et le deuxième document :", similarite[0][0])
