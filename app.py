@@ -3,6 +3,9 @@ import json
 import pandas as pd
 import nltk
 from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+import string
+
 
 def parcourir_repertoire(repertoire):
     dfs = [] 
@@ -17,16 +20,21 @@ def parcourir_repertoire(repertoire):
                     df = pd.json_normalize(contenu)
                     # Tokenisation du texte dans toutes les colonnes
                     df_tokenise = df.applymap(tokeniser_texte)
-                    dfs.append(df_tokenise)
-                 
+                    dfs.append(df_tokenise)    
     return dfs
 
 def tokeniser_texte(texte):
     # Tokenisation des mots
     tokens = word_tokenize(str(texte))
+    # Suppression de la ponctuation
+    tokens = [mot for mot in tokens if mot not in string.punctuation]
+    # Suppression des stopwords
+    stop_words = set(stopwords.words('english'))
+    tokens = [mot for mot in tokens if mot.lower() not in stop_words]
     return tokens
 
 # Les données nécessaires pour NLTK
+nltk.download('stopwords')
 nltk.download('punkt')
 
 # Chemin du répertoire à parcourir
