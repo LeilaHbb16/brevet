@@ -7,6 +7,7 @@ import pandas as pd
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
+from sklearn.model_selection import KFold
 
 # Les données nécessaires pour NLTK
 nltk.download('stopwords')
@@ -101,7 +102,14 @@ embedding_dim = 100
 
 representations_vectorielles = []
 for document in donnees:
-    # Vectoriser le texte du document en utilisant les embeddings GloVe
+    # Vectorisation du texte du document en utilisant les embeddings GloVe
     representation_document = vectoriser_texte(document, embeddings_index, embedding_dim)
-    # Ajouter la représentation vectorielle du document à la liste des représentations vectorielles
+    # Ajout de la représentation vectorielle du document à la liste des représentations vectorielles
     representations_vectorielles.append(representation_document)
+
+
+kf = KFold(n_splits=5, shuffle=True, random_state=42)
+
+for fold, (train_index, val_index) in enumerate(kf.split(representations_vectorielles), 1):
+    # Diviser les données en ensembles d'entraînement et de validation
+    X_train, X_val = [representations_vectorielles[i] for i in train_index], [representations_vectorielles[i] for i in val_index]
