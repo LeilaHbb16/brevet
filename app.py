@@ -7,9 +7,6 @@ import pandas as pd
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
-from gensim.models import KeyedVectors
-from gensim.scripts.glove2word2vec import glove2word2vec
-
 
 # Les données nécessaires pour NLTK
 nltk.download('stopwords')
@@ -59,21 +56,6 @@ repertoire_a_explorer = '../brevets_alternants'
 # Charger les données JSON dans une liste de DataFrames
 donnees = parcourir_repertoire(repertoire_a_explorer, cles_a_supprimer)
 
-
-# Chemin vers le fichier GloVe
-glove_file = './wordEmb/glove.6B.100d.txt'
-
-# Chemin de sortie pour le fichier converti
-word2vec_output_file = './wordEmb/glove.6B.100d.word2vec'
-
-# Convertir le fichier GloVe au format word2vec
-glove2word2vec(glove_file, word2vec_output_file)
-
-# Charger les embeddings Word2Vec convertis
-word2vec_model = KeyedVectors.load_word2vec_format(word2vec_output_file, binary=False)
-
-
-
 def load_embeddings(file_path):
     embeddings_index = {}
     with open(file_path, encoding='utf-8') as f:
@@ -83,30 +65,43 @@ def load_embeddings(file_path):
             coefs = np.asarray(values[1:], dtype='float32')
             embeddings_index[word] = coefs
     return embeddings_index
-def vectoriser_texte(texte, embeddings_model):
+
+# Chemin vers le fichier d'embeddings GloVe
+embedding_file_path = './wordEmb/glove.6B.100d.txt'
+
+# Charger les embeddings
+embeddings_index = load_embeddings(embedding_file_path)
+ 
+def vectoriser_texte(texte, embeddings_index, embedding_dim):
     # Initialiser une liste pour stocker les vecteurs de mots
     vecteurs = []
     # Parcourir chaque mot dans le texte tokenisé
     for mot in texte:
-        # Vérifier si le mot se trouve dans le modèle d'embeddings
-        if mot in embeddings_model:
-            # Récupérer le vecteur correspondant au mot
-            vecteur_mot = embeddings_model[mot]
-            # Ajouter le vecteur du mot à la liste des vecteurs
-            vecteurs.append(vecteur_mot)
-    # Calculer la moyenne des vecteurs de mots
+        # Vérifier si le mot se trouve dans les embeddings GloVe
+        if mot in embeddings_index:
+            # Récupérer le vecteur GloVe correspondant
+            vecteur_mot = embeddings_index[mot]
+        else:
+            
+             # Vecteur zéro pour les mots hors vocabulaire
+            vecteur_mot = np.zeros(embedding_dim) 
+        # Ajouter le vecteur du mot à la liste des vecteurs
+        vecteurs.append(vecteur_mot)
+    # Agréger les vecteurs de mots pour obtenir une représentation vectorielle du texte
     if vecteurs:
         # Moyenne des vecteurs de mots
         representation_texte = np.mean(vecteurs, axis=0) 
     else:
         # Vecteur zéro si aucun mot n'est présent
-        representation_texte = np.zeros(embeddings_model.vector_size)  
+        representation_texte = np.zeros(embedding_dim)  
     return representation_texte
 
+# Taille de dimension des embeddings GloVe
+embedding_dim = 100 
 
 representations_vectorielles = []
 for document in donnees:
-    # Vectoriser le texte du document en utilisant les embeddings Word2Vec
-    representation_document = vectoriser_texte(document, word2vec_model)
+    # Vectoriser le texte du document en utilisant les embeddings GloVe
+    representation_document = vectoriser_texte(document, embeddings_index, embedding_dim)
     # Ajouter la représentation vectorielle du document à la liste des représentations vectorielles
     representations_vectorielles.append(representation_document)
