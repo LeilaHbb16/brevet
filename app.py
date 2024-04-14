@@ -71,7 +71,7 @@ embedding_file_path = './wordEmb/glove.6B.100d.txt'
 
 # Charger les embeddings
 embeddings_index = load_embeddings(embedding_file_path)
-
+ 
 def vectoriser_texte(texte, embeddings_index, embedding_dim):
     # Initialiser une liste pour stocker les vecteurs de mots
     vecteurs = []
