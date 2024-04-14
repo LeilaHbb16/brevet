@@ -1,0 +1,5 @@
+# Ignorer le répertoire brevets_alternants
+brevets_alternants/
+
+wordEmb/glove.6B.100d.txt
+
